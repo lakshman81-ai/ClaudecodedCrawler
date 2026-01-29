@@ -1,0 +1,631 @@
+# =============================================================================
+# EduCrawler CSS/XPath Selectors Configuration
+# =============================================================================
+# This file defines all DOM selectors for content extraction from each source.
+# Selectors are organized by source and content type.
+# 
+# Selector Types:
+#   css: CSS selector (preferred)
+#   xpath: XPath selector (fallback)
+#   attribute: Extract attribute value instead of text
+#   multiple: Select multiple elements
+#   required: Extraction fails if not found
+#   fallback: Alternative selector if primary fails
+# =============================================================================
+
+version: "1.0"
+last_updated: "2026-01-29"
+
+# =============================================================================
+# KHAN ACADEMY SELECTORS
+# =============================================================================
+khan_academy:
+  # Page metadata
+  metadata:
+    page_title:
+      css: "h1[data-test-id='lesson-title'], .lesson-title, h1.title"
+      required: true
+    
+    breadcrumb:
+      css: "nav[aria-label='breadcrumb'] a, .breadcrumb a"
+      multiple: true
+      required: false
+    
+    last_updated:
+      css: ".last-updated, time[datetime]"
+      attribute: "datetime"
+      required: false
+  
+  # Main content
+  content:
+    article_body:
+      css: "[data-test-id='article-renderer'] .paragraph, .perseus-article, .article-content p"
+      xpath: "//div[contains(@class, 'article-renderer')]//p | //div[contains(@class, 'perseus-article')]//p"
+      multiple: true
+      required: true
+      fallback: ".content-area p, main p"
+    
+    section_headings:
+      css: "[data-test-id='article-renderer'] h2, .perseus-article h2, .article-content h2"
+      multiple: true
+      required: false
+    
+    key_points:
+      css: ".key-takeaways li, .summary-points li, .callout-box"
+      multiple: true
+      required: false
+    
+    definition_box:
+      css: ".definition-box, .vocab-definition, [data-test-id='definition']"
+      multiple: true
+      required: false
+  
+  # Mathematical content
+  math:
+    mathjax_elements:
+      css: ".MathJax, .MathJax_Display, .MathJax_Preview"
+      multiple: true
+      required: false
+    
+    katex_elements:
+      css: ".katex, .katex-display"
+      multiple: true
+      required: false
+    
+    math_latex:
+      css: "script[type='math/tex'], annotation[encoding='application/x-tex']"
+      multiple: true
+      required: false
+    
+    math_formula_attr:
+      css: "[data-math-formula]"
+      attribute: "data-math-formula"
+      multiple: true
+      required: false
+  
+  # Video content
+  video:
+    video_container:
+      css: "[data-test-id='video-player'], .video-js, .youtube-player"
+      required: false
+    
+    youtube_video_id:
+      css: "[data-youtube-id]"
+      attribute: "data-youtube-id"
+      required: false
+    
+    video_title:
+      css: ".video-title, [data-test-id='video-title']"
+      required: false
+    
+    video_description:
+      css: ".video-description, [data-test-id='video-description']"
+      required: false
+    
+    video_duration:
+      css: ".video-duration, [data-duration]"
+      attribute: "data-duration"
+      required: false
+  
+  # Exercise content
+  exercise:
+    container:
+      css: ".perseus-renderer, [data-test-id='exercise-content'], .exercise-container"
+      required: false
+    
+    question_text:
+      css: ".perseus-renderer .paragraph, .question-content p"
+      multiple: true
+      required: false
+    
+    answer_choices:
+      css: ".perseus-radio-option, .choice-clue, .answer-option"
+      multiple: true
+      required: false
+    
+    correct_answer:
+      css: "[data-is-correct='true'], .correct-answer"
+      required: false
+    
+    hints:
+      css: ".hint-content, [data-test-id='hint']"
+      multiple: true
+      required: false
+    
+    explanation:
+      css: ".explanation-content, .solution-explanation"
+      required: false
+  
+  # Images
+  images:
+    content_images:
+      css: ".article-content img, .perseus-article img, [data-test-id='image']"
+      attribute: "src"
+      multiple: true
+      required: false
+    
+    image_alt_text:
+      css: ".article-content img, .perseus-article img"
+      attribute: "alt"
+      multiple: true
+      required: false
+    
+    figure_caption:
+      css: "figcaption, .image-caption"
+      multiple: true
+      required: false
+  
+  # Navigation
+  navigation:
+    related_content:
+      css: "[data-test-id='related-content'] a, .related-topics a"
+      attribute: "href"
+      multiple: true
+      required: false
+    
+    next_lesson:
+      css: "[data-test-id='next-button'] a, .next-lesson a"
+      attribute: "href"
+      required: false
+    
+    prev_lesson:
+      css: "[data-test-id='prev-button'] a, .prev-lesson a"
+      attribute: "href"
+      required: false
+
+# =============================================================================
+# BYJUS SELECTORS
+# =============================================================================
+byjus:
+  # Page metadata
+  metadata:
+    page_title:
+      css: "h1.entry-title, h1.article-title, .page-title h1, h1"
+      required: true
+    
+    breadcrumb:
+      css: ".breadcrumb a, nav.breadcrumb a"
+      multiple: true
+      required: false
+    
+    author:
+      css: ".author-name, .entry-author"
+      required: false
+    
+    published_date:
+      css: ".published-date, time.entry-date"
+      attribute: "datetime"
+      required: false
+  
+  # Main content
+  content:
+    article_body:
+      css: ".article-content, .post-content, .entry-content"
+      fallback: "article p, .content-wrapper p, main p"
+      multiple: true
+      required: true
+    
+    section_headings:
+      css: ".article-content h2, .post-content h2, .entry-content h2"
+      multiple: true
+      required: false
+    
+    subsection_headings:
+      css: ".article-content h3, .post-content h3"
+      multiple: true
+      required: false
+    
+    definition_box:
+      css: ".definition-box, .info-box, .highlight-box, .callout"
+      multiple: true
+      required: false
+    
+    important_notes:
+      css: ".important-note, .note-box, .alert-info"
+      multiple: true
+      required: false
+    
+    summary_section:
+      css: ".summary, .key-takeaways, .conclusion"
+      required: false
+  
+  # Mathematical content
+  math:
+    mathjax_elements:
+      css: ".MathJax, .MathJax_Display"
+      multiple: true
+      required: false
+    
+    formula_container:
+      css: ".formula-box, .equation-box, .math-formula"
+      multiple: true
+      required: false
+    
+    inline_math:
+      css: ".inline-math, span.math"
+      multiple: true
+      required: false
+  
+  # Examples and problems
+  examples:
+    example_box:
+      css: ".example-box, .worked-example, .solved-example"
+      multiple: true
+      required: false
+    
+    example_title:
+      css: ".example-box h4, .example-title"
+      multiple: true
+      required: false
+    
+    example_problem:
+      css: ".example-problem, .question-text"
+      multiple: true
+      required: false
+    
+    example_solution:
+      css: ".example-solution, .solution-steps"
+      multiple: true
+      required: false
+    
+    practice_problems:
+      css: ".practice-questions, .exercise-section, .problems-list"
+      required: false
+  
+  # Tables
+  tables:
+    data_tables:
+      css: "table.data-table, .article-content table, table.comparison"
+      multiple: true
+      required: false
+    
+    table_headers:
+      css: "table th, thead td"
+      multiple: true
+      required: false
+    
+    table_rows:
+      css: "table tbody tr"
+      multiple: true
+      required: false
+  
+  # Images
+  images:
+    content_images:
+      css: ".article-content img, .post-content img"
+      attribute: "src"
+      multiple: true
+      required: false
+    
+    image_captions:
+      css: "figcaption, .image-caption, .wp-caption-text"
+      multiple: true
+      required: false
+  
+  # FAQs
+  faqs:
+    faq_section:
+      css: ".faq-section, .frequently-asked, #faqs"
+      required: false
+    
+    faq_questions:
+      css: ".faq-question, .faq-item h3, .accordion-header"
+      multiple: true
+      required: false
+    
+    faq_answers:
+      css: ".faq-answer, .faq-item .answer, .accordion-content"
+      multiple: true
+      required: false
+  
+  # Related content
+  navigation:
+    related_topics:
+      css: ".related-topics a, .related-posts a, .see-also a"
+      attribute: "href"
+      multiple: true
+      required: false
+
+# =============================================================================
+# VEDANTU SELECTORS
+# =============================================================================
+vedantu:
+  # Page metadata
+  metadata:
+    page_title:
+      css: "h1.page-title, h1.topic-title, h1"
+      required: true
+    
+    breadcrumb:
+      css: ".breadcrumb a, .nav-breadcrumb a"
+      multiple: true
+      required: false
+  
+  # Main content
+  content:
+    article_body:
+      css: ".article-content, .main-content, .topic-content"
+      fallback: "article p, .content-area p"
+      multiple: true
+      required: true
+    
+    section_headings:
+      css: ".article-content h2, .topic-content h2"
+      multiple: true
+      required: false
+  
+  # NCERT-specific content
+  ncert:
+    solution_container:
+      css: ".ncert-solution, .solution-content, .answer-content"
+      multiple: true
+      required: false
+    
+    question_answer_pair:
+      css: ".qa-pair, .question-answer-block"
+      multiple: true
+      required: false
+    
+    question_text:
+      css: ".question-text, .qa-question"
+      multiple: true
+      required: false
+    
+    answer_text:
+      css: ".answer-text, .qa-answer, .solution-text"
+      multiple: true
+      required: false
+  
+  # Mathematical content
+  math:
+    mathjax_elements:
+      css: ".MathJax, .katex, .math-content"
+      multiple: true
+      required: false
+  
+  # Key concepts
+  concepts:
+    key_points:
+      css: ".key-points, .important-points, .summary-box"
+      multiple: true
+      required: false
+    
+    definition:
+      css: ".definition, .term-definition"
+      multiple: true
+      required: false
+  
+  # Examples
+  examples:
+    solved_examples:
+      css: ".solved-example, .example-solution"
+      multiple: true
+      required: false
+  
+  # PDF downloads
+  downloads:
+    pdf_link:
+      css: "a[href*='/content-files-downloadable/'], a.pdf-download, a[href$='.pdf']"
+      attribute: "href"
+      multiple: true
+      required: false
+  
+  # FAQs
+  faqs:
+    faq_section:
+      css: ".faq-section, .frequently-asked"
+      required: false
+    
+    faq_questions:
+      css: ".faq-question, .faq-item h3"
+      multiple: true
+      required: false
+    
+    faq_answers:
+      css: ".faq-answer, .faq-item .answer"
+      multiple: true
+      required: false
+
+# =============================================================================
+# YOUTUBE SELECTORS (Fallback for DOM extraction)
+# =============================================================================
+youtube:
+  # Note: Primary extraction uses youtube-transcript-api
+  # These selectors are fallback for DOM scraping
+  
+  video:
+    title:
+      css: "h1.ytd-video-primary-info-renderer, #title h1, yt-formatted-string.ytd-video-primary-info-renderer"
+      required: false
+    
+    channel_name:
+      css: "#channel-name a, ytd-channel-name a, .ytd-channel-name"
+      required: false
+    
+    description:
+      css: "#description-inline-expander, ytd-text-inline-expander, #description"
+      required: false
+    
+    view_count:
+      css: ".view-count, ytd-video-view-count-renderer span"
+      required: false
+    
+    publish_date:
+      css: "#info-strings yt-formatted-string, .date"
+      required: false
+  
+  transcript:
+    segment_text:
+      css: "ytd-transcript-segment-renderer .segment-text"
+      multiple: true
+      required: false
+    
+    segment_timestamp:
+      css: "ytd-transcript-segment-renderer .segment-timestamp"
+      multiple: true
+      required: false
+
+# =============================================================================
+# GOOGLE SEARCH SELECTORS
+# =============================================================================
+google_search:
+  results:
+    search_results:
+      css: "div.g, div[data-hveid], .tF2Cxc"
+      multiple: true
+      required: true
+    
+    result_title:
+      css: "h3, .DKV0Md"
+      multiple: true
+      required: false
+    
+    result_link:
+      css: "a[href^='http']"
+      attribute: "href"
+      multiple: true
+      required: false
+    
+    result_snippet:
+      css: ".VwiC3b, .lEBKkf, .st"
+      multiple: true
+      required: false
+  
+  featured:
+    featured_snippet:
+      css: ".xpdopen, .ifM9O, .kp-blk"
+      required: false
+    
+    knowledge_panel:
+      css: ".kp-wholepage, .knowledge-panel, .kp-blk"
+      required: false
+    
+    people_also_ask:
+      css: ".related-question-pair, .g .related-question"
+      multiple: true
+      required: false
+
+# =============================================================================
+# NOTEBOOKLM SELECTORS
+# =============================================================================
+notebooklm:
+  # Authentication
+  auth:
+    sign_in_button:
+      css: "button:has-text('Sign in')"
+      required: false
+    
+    google_account_picker:
+      css: "div[data-identifier]"
+      required: false
+  
+  # Main navigation
+  navigation:
+    create_button:
+      css: "button:has-text('Create'), button:has-text('New notebook')"
+      required: true
+    
+    notebook_list:
+      css: ".notebook-list, [data-notebook-id]"
+      required: false
+    
+    notebook_title_input:
+      css: "input[aria-label*='title'], .notebook-title-input"
+      required: false
+  
+  # Source panel
+  sources:
+    add_source_button:
+      css: "button:has-text('Add source'), button[aria-label*='Add source']"
+      required: true
+    
+    source_type_chip:
+      css: "span.mdc-evolution-chip__text-label"
+      multiple: true
+      required: true
+    
+    source_url_input:
+      css: "input[type='text'][placeholder*='URL'], input[type='url']"
+      required: false
+    
+    source_text_input:
+      css: "textarea[placeholder*='Paste'], .text-source-input"
+      required: false
+    
+    insert_button:
+      css: "button:has-text('Insert'), button:has-text('Add')"
+      required: true
+    
+    source_list:
+      css: ".source-list, [data-source-id]"
+      required: false
+    
+    source_item:
+      css: ".source-item, [role='listitem']"
+      multiple: true
+      required: false
+    
+    processing_indicator:
+      css: ".processing-indicator, .loading-spinner"
+      required: false
+  
+  # Chat panel
+  chat:
+    chat_input:
+      css: "textarea[placeholder*='Ask'], .chat-input"
+      required: false
+    
+    send_button:
+      css: "button[aria-label*='Send'], button:has-text('Send')"
+      required: false
+    
+    chat_messages:
+      css: ".chat-message, [role='article']"
+      multiple: true
+      required: false
+  
+  # Studio panel
+  studio:
+    studio_tab:
+      css: "button:has-text('Studio'), [role='tab']:has-text('Studio')"
+      required: false
+    
+    output_type_button:
+      css: "button:has-text('{output_type}')"
+      required: false
+    
+    generate_button:
+      css: "button:has-text('Generate'), button:has-text('Create')"
+      required: false
+    
+    generated_content:
+      css: ".generated-content, .studio-output, [data-output-content]"
+      required: false
+    
+    copy_button:
+      css: "button[aria-label*='Copy'], button:has-text('Copy')"
+      required: false
+  
+  # Dialogs
+  dialogs:
+    dialog_container:
+      css: "[role='dialog'], .modal, .dialog"
+      required: false
+    
+    close_button:
+      css: "button[aria-label*='Close'], button:has-text('Cancel')"
+      required: false
+    
+    confirm_button:
+      css: "button:has-text('Confirm'), button:has-text('OK')"
+      required: false
+  
+  # Error indicators
+  errors:
+    error_message:
+      css: ".error-message, [role='alert']"
+      required: false
+    
+    toast_notification:
+      css: ".toast, .snackbar, [role='status']"
+      required: false

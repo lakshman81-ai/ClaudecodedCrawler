@@ -1,0 +1,10 @@
+pydantic>=2.0
+aiohttp>=3.9
+beautifulsoup4>=4.12
+markdownify>=0.11
+youtube-transcript-api>=0.6
+jinja2>=3.1
+datasketch>=1.6
+pytest>=7.4
+pytest-asyncio>=0.21
+ruff>=0.1
