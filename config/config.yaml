@@ -1,0 +1,473 @@
+# EduCrawler Configuration Schema
+# ================================
+# 
+# This file defines all configurable parameters for the EduCrawler system.
+# Copy this file to `config.yaml` and modify as needed.
+#
+# Environment variables can override any setting using the format:
+# EDUCRAWLER_<SECTION>_<SETTING>=value
+#
+# Example: EDUCRAWLER_RATE_LIMITS_MIN_INTERVAL=3.0
+
+# Version of this configuration schema
+schema_version: "1.0.0"
+
+# =============================================================================
+# GLOBAL SETTINGS
+# =============================================================================
+global:
+  # Application name (for logging and identification)
+  app_name: "EduCrawler"
+  
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  log_level: "INFO"
+  
+  # Log format: json, text
+  log_format: "json"
+  
+  # Default timeout for all operations (seconds)
+  global_timeout: 300
+  
+  # Working directory for temporary files
+  temp_dir: "/tmp/educrawler"
+  
+  # Cache directory for storing extracted content
+  cache_dir: "/tmp/educrawler/cache"
+  
+  # Enable caching of extracted content
+  enable_cache: true
+  
+  # Cache TTL in seconds (24 hours default)
+  cache_ttl: 86400
+
+# =============================================================================
+# SOURCE HANDLERS
+# =============================================================================
+sources:
+  # Default source priority (1 = highest)
+  default_priority:
+    khan_academy: 1
+    byjus: 2
+    vedantu: 3
+    youtube: 4
+    google_search: 5
+  
+  # Which sources are enabled by default
+  enabled_by_default:
+    - khan_academy
+    - byjus
+    - vedantu
+    - youtube
+  
+  # Source-specific configuration
+  khan_academy:
+    enabled: true
+    base_url: "https://www.khanacademy.org"
+    timeout: 30
+    max_retries: 3
+    requires_js: true
+    mathjax_wait_seconds: 2.5
+    rate_limit:
+      min_interval: 2.0
+      max_per_minute: 20
+    
+  byjus:
+    enabled: true
+    base_url: "https://byjus.com"
+    timeout: 30
+    max_retries: 4
+    requires_js: true
+    mathjax_wait_seconds: 2.5
+    cloudflare_protection: true
+    rate_limit:
+      min_interval: 3.0
+      max_per_minute: 15
+    
+  vedantu:
+    enabled: true
+    base_url: "https://www.vedantu.com"
+    timeout: 30
+    max_retries: 3
+    requires_js: true
+    mathjax_wait_seconds: 2.5
+    cloudflare_protection: true
+    pdf_extraction: true
+    rate_limit:
+      min_interval: 3.0
+      max_per_minute: 15
+    
+  youtube:
+    enabled: true
+    timeout: 30
+    max_retries: 2
+    rate_limit:
+      min_interval: 1.0
+      max_per_minute: 30
+    # Transcript extraction settings
+    transcript:
+      preferred_languages:
+        - en
+        - en-US
+        - en-GB
+      fallback_to_auto_generated: true
+      include_timestamps: true
+    # Proxy settings (required for cloud deployment)
+    proxy:
+      enabled: false
+      rotation: false
+      # List of proxy URLs or use environment variable
+      # EDUCRAWLER_YOUTUBE_PROXY_LIST="http://proxy1:port,http://proxy2:port"
+      proxy_list: []
+    
+  google_search:
+    enabled: false  # Disabled by default (fallback only)
+    timeout: 30
+    max_retries: 2
+    rate_limit:
+      min_interval: 5.0
+      max_per_minute: 10
+
+# =============================================================================
+# RATE LIMITING (Global defaults)
+# =============================================================================
+rate_limits:
+  # Minimum interval between requests to same domain (seconds)
+  min_interval: 2.0
+  
+  # Maximum requests per minute per domain
+  max_per_minute: 20
+  
+  # Burst allowance (additional requests in quick succession)
+  burst_allowance: 2
+  
+  # Respect Retry-After headers from servers
+  respect_retry_after: true
+
+# =============================================================================
+# RETRY CONFIGURATION
+# =============================================================================
+retry:
+  # Maximum number of retry attempts
+  max_retries: 3
+  
+  # Base delay for exponential backoff (seconds)
+  backoff_base: 2.0
+  
+  # Maximum delay between retries (seconds)
+  backoff_max: 32.0
+  
+  # Jitter range (random variation in delay)
+  jitter_min: 0.0
+  jitter_max: 0.5
+  
+  # HTTP status codes that trigger retry
+  retry_status_codes:
+    - 429  # Too Many Requests
+    - 500  # Internal Server Error
+    - 502  # Bad Gateway
+    - 503  # Service Unavailable
+    - 504  # Gateway Timeout
+
+# =============================================================================
+# BROWSER CONFIGURATION (Playwright)
+# =============================================================================
+browser:
+  # Browser type: chromium, firefox, webkit
+  type: "chromium"
+  
+  # Run headless (no visible browser window)
+  headless: true
+  
+  # Slow motion delay between actions (milliseconds)
+  slow_mo: 50
+  
+  # Viewport dimensions
+  viewport:
+    width: 1280
+    height: 800
+  
+  # User agent string
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  
+  # Page load timeout (milliseconds)
+  page_load_timeout: 30000
+  
+  # Element wait timeout (milliseconds)
+  element_timeout: 10000
+  
+  # Navigation timeout (milliseconds)
+  navigation_timeout: 30000
+  
+  # Maximum concurrent browser contexts
+  max_contexts: 3
+
+# =============================================================================
+# NOTEBOOKLM INTEGRATION
+# =============================================================================
+notebooklm:
+  # Enable NotebookLM integration
+  enabled: true
+  
+  # Base URL
+  base_url: "https://notebooklm.google.com"
+  
+  # Path to saved authentication state
+  auth_state_path: "notebooklm_auth.json"
+  
+  # Maximum sources per notebook
+  max_sources: 50
+  
+  # Maximum characters for text sources
+  max_text_chars: 500000
+  
+  # Compilation timeout (milliseconds)
+  compilation_timeout: 60000
+  
+  # Delay between DOM actions (seconds)
+  action_delay: 1.0
+  
+  # Delay after adding source (seconds)
+  source_processing_delay: 3.0
+  
+  # Output generation settings
+  output:
+    # Preferred output type for study materials
+    study_material_type: "Study guide"
+    # Include FAQ in output
+    include_faq: false
+    # Include timeline (for history topics)
+    include_timeline: false
+
+# =============================================================================
+# CONTENT PROCESSING
+# =============================================================================
+processing:
+  # HTML to Markdown conversion
+  html_to_markdown:
+    # Strip HTML tags that can't be converted
+    strip_unknown_tags: true
+    # Preserve code blocks
+    preserve_code_blocks: true
+    # Convert tables to markdown
+    convert_tables: true
+  
+  # LaTeX/MathML preservation
+  math:
+    # Preserve LaTeX expressions
+    preserve_latex: true
+    # Convert MathML to LaTeX
+    mathml_to_latex: true
+    # Generate Unicode fallback
+    generate_unicode: true
+  
+  # Deduplication settings
+  deduplication:
+    # Enable deduplication
+    enabled: true
+    # Similarity threshold (0.0 - 1.0)
+    similarity_threshold: 0.85
+    # Algorithm: minhash, cosine, jaccard
+    algorithm: "minhash"
+    # Number of hash functions for MinHash
+    minhash_num_hashes: 100
+
+# =============================================================================
+# QUALITY GATES
+# =============================================================================
+quality:
+  # Minimum content quality score to accept (0.0 - 1.0)
+  min_quality_score: 0.6
+  
+  # Minimum number of content items required
+  min_content_items: 3
+  
+  # Required content types
+  required_content_types:
+    - concepts
+  
+  # Validation rules
+  validation:
+    # Require at least N concepts
+    min_concepts: 2
+    # Require at least N formulas for STEM subjects
+    min_formulas_stem: 1
+    # Require at least N examples
+    min_examples: 1
+
+# =============================================================================
+# OUTPUT CONFIGURATION
+# =============================================================================
+output:
+  # Output formats to generate
+  formats:
+    - html
+    - pdf  # Requires wkhtmltopdf
+  
+  # Template directory
+  template_dir: "templates"
+  
+  # Include source attribution
+  include_attribution: true
+  
+  # Study Material settings
+  study_material:
+    # Pedagogical model by subject
+    pedagogical_models:
+      physics: "5e"
+      chemistry: "5e"
+      mathematics: "les"
+      biology: "5e"
+      history: "narrative"
+      english: "rule_example"
+    # Minimum concept boxes per page
+    min_boxes_per_page: 3
+    # Maximum pages
+    max_pages: 7
+  
+  # Questionnaire settings
+  questionnaire:
+    # Total questions (MUST be 50 per validation checklist)
+    total_questions: 50
+    # Tier distribution
+    tier_1_count: 20
+    tier_2_count: 20
+    tier_3_count: 10
+    # Minimum assertion-reasoning questions in Tier 3
+    min_assertion_reasoning: 6
+    # Generate answer key
+    include_answer_key: true
+  
+  # Handout settings
+  handout:
+    # Maximum colors
+    max_colors: 5
+    # Minimum formula table entries
+    min_formulas: 3
+    # Minimum pro tips per category
+    min_memory_tricks: 2
+    min_pro_formulas: 2
+    min_dont_confuse: 2
+
+# =============================================================================
+# SUBJECT-SPECIFIC SETTINGS
+# =============================================================================
+subjects:
+  physics:
+    keywords:
+      - force
+      - motion
+      - energy
+      - work
+      - power
+      - electricity
+      - magnetism
+      - waves
+      - light
+      - sound
+    pedagogical_model: "5e"
+    color_palette:
+      - "#2563eb"  # Blue
+      - "#1e40af"
+      - "#3b82f6"
+      - "#60a5fa"
+      - "#93c5fd"
+    
+  chemistry:
+    keywords:
+      - atom
+      - molecule
+      - element
+      - compound
+      - reaction
+      - bond
+      - acid
+      - base
+      - periodic
+    pedagogical_model: "5e"
+    color_palette:
+      - "#059669"  # Green
+      - "#047857"
+      - "#10b981"
+      - "#34d399"
+      - "#6ee7b7"
+    
+  mathematics:
+    keywords:
+      - equation
+      - formula
+      - theorem
+      - proof
+      - algebra
+      - geometry
+      - probability
+      - statistics
+    pedagogical_model: "les"
+    color_palette:
+      - "#7c3aed"  # Purple
+      - "#6d28d9"
+      - "#8b5cf6"
+      - "#a78bfa"
+      - "#c4b5fd"
+    
+  biology:
+    keywords:
+      - cell
+      - organism
+      - evolution
+      - genetics
+      - ecosystem
+      - photosynthesis
+      - respiration
+    pedagogical_model: "5e"
+    color_palette:
+      - "#16a34a"  # Emerald
+      - "#15803d"
+      - "#22c55e"
+      - "#4ade80"
+      - "#86efac"
+    
+  history:
+    keywords:
+      - empire
+      - revolution
+      - civilization
+      - war
+      - independence
+      - dynasty
+      - colonization
+    pedagogical_model: "narrative"
+    color_palette:
+      - "#b45309"  # Amber
+      - "#d97706"
+      - "#f59e0b"
+      - "#fbbf24"
+      - "#fcd34d"
+
+# =============================================================================
+# ANTIGRAVITY PLATFORM SETTINGS
+# =============================================================================
+antigravity:
+  # JavaScript execution policy
+  js_execution_policy: "allow_list"
+  
+  # Allowed domains for browser subagent
+  allowed_domains:
+    - "khanacademy.org"
+    - "www.khanacademy.org"
+    - "byjus.com"
+    - "www.byjus.com"
+    - "vedantu.com"
+    - "www.vedantu.com"
+    - "youtube.com"
+    - "www.youtube.com"
+    - "youtu.be"
+    - "notebooklm.google.com"
+    - "google.com"
+    - "www.google.com"
+  
+  # Blocked domains
+  blocked_domains:
+    - "facebook.com"
+    - "twitter.com"
+    - "instagram.com"
+    - "tiktok.com"

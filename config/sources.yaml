@@ -1,0 +1,393 @@
+# =============================================================================
+# EduCrawler Source Configuration
+# =============================================================================
+# This file defines configuration for all content sources including:
+# - Base URLs and URL patterns
+# - Rate limiting parameters
+# - Retry policies
+# - Feature flags
+# =============================================================================
+
+version: "1.0"
+last_updated: "2026-01-29"
+
+# =============================================================================
+# GLOBAL DEFAULTS
+# =============================================================================
+defaults:
+  rate_limit:
+    min_interval_seconds: 2.0
+    max_requests_per_minute: 20
+    burst_allowed: 2
+  
+  retry:
+    max_retries: 3
+    backoff_base: 2.0
+    backoff_max_seconds: 32.0
+    jitter_range: [0.0, 0.5]
+    retry_on_status_codes: [429, 500, 502, 503, 504]
+  
+  timeouts:
+    page_load_seconds: 30
+    element_wait_seconds: 10
+    network_idle_seconds: 5
+  
+  browser:
+    requires_js_rendering: true
+    wait_for_mathjax: true
+    viewport_width: 1280
+    viewport_height: 800
+
+# =============================================================================
+# KHAN ACADEMY
+# =============================================================================
+khan_academy:
+  enabled: true
+  priority: 1  # Highest priority
+  
+  domain: "khanacademy.org"
+  
+  base_urls:
+    physics: "https://www.khanacademy.org/science/physics"
+    chemistry: "https://www.khanacademy.org/science/chemistry"
+    biology: "https://www.khanacademy.org/science/biology"
+    mathematics: "https://www.khanacademy.org/math"
+  
+  url_patterns:
+    topic: "https://www.khanacademy.org/science/{subject}/{topic_slug}"
+    lesson: "https://www.khanacademy.org/science/{subject}/{unit}/{lesson}"
+    video: "https://www.khanacademy.org/science/{subject}/{unit}/{lesson}/v/{video_slug}"
+    exercise: "https://www.khanacademy.org/science/{subject}/{unit}/{lesson}/e/{exercise_slug}"
+  
+  sitemap_url: "https://www.khanacademy.org/sitemap.xml"
+  
+  rate_limit:
+    min_interval_seconds: 2.0
+    max_requests_per_minute: 20
+    burst_allowed: 2
+  
+  retry:
+    max_retries: 3
+    backoff_base: 2.0
+    backoff_max_seconds: 16.0
+  
+  browser:
+    requires_js_rendering: true
+    wait_for_mathjax: true
+    mathjax_wait_seconds: 3
+    user_agent_rotation: true
+  
+  content_types:
+    - articles
+    - videos
+    - exercises
+  
+  quality_signals:
+    min_content_length: 200
+    require_math_content: false
+    prefer_videos: true
+  
+  robots_txt:
+    allows_crawling: true
+    disallowed_patterns:
+      - "/api/"
+      - "/profile/"
+    notes: "GPTBot blocked but general crawling allowed for educational content"
+
+# =============================================================================
+# BYJUS
+# =============================================================================
+byjus:
+  enabled: true
+  priority: 2
+  
+  domain: "byjus.com"
+  
+  base_urls:
+    physics: "https://byjus.com/physics/"
+    chemistry: "https://byjus.com/chemistry/"
+    mathematics: "https://byjus.com/maths/"
+    biology: "https://byjus.com/biology/"
+    cbse: "https://byjus.com/cbse-notes/"
+  
+  url_patterns:
+    topic: "https://byjus.com/{subject}/{topic_slug}/"
+    cbse_notes: "https://byjus.com/cbse-notes/class-{grade}-{subject}-{topic_slug}/"
+    ncert: "https://byjus.com/ncert-solutions/class-{grade}-{subject}/"
+  
+  rate_limit:
+    min_interval_seconds: 3.0  # More conservative due to Cloudflare
+    max_requests_per_minute: 15
+    burst_allowed: 1
+  
+  retry:
+    max_retries: 4
+    backoff_base: 3.0
+    backoff_max_seconds: 32.0
+    retry_on_status_codes: [429, 500, 502, 503, 504, 403]  # Include 403 for Cloudflare
+  
+  browser:
+    requires_js_rendering: true
+    wait_for_mathjax: true
+    mathjax_wait_seconds: 3
+    cloudflare_protected: true
+    stealth_mode: true
+  
+  content_types:
+    - articles
+    - definitions
+    - examples
+    - formulas
+  
+  quality_signals:
+    min_content_length: 300
+    require_math_content: false
+    ncert_aligned: true
+  
+  special_handling:
+    handle_cloudflare_challenge: true
+    challenge_wait_seconds: 5
+
+# =============================================================================
+# VEDANTU
+# =============================================================================
+vedantu:
+  enabled: true
+  priority: 3
+  
+  domain: "vedantu.com"
+  
+  base_urls:
+    physics: "https://www.vedantu.com/physics/"
+    chemistry: "https://www.vedantu.com/chemistry/"
+    mathematics: "https://www.vedantu.com/maths/"
+    biology: "https://www.vedantu.com/biology/"
+    ncert: "https://www.vedantu.com/ncert-solutions/"
+  
+  url_patterns:
+    topic: "https://www.vedantu.com/{subject}/{topic_slug}"
+    ncert_chapter: "https://www.vedantu.com/ncert-solutions/class-{grade}-science-chapter-{topic_slug}"
+    ncert_solution: "https://www.vedantu.com/ncert-solutions/ncert-solutions-class-{grade}-{subject}-chapter-{chapter}"
+  
+  pdf_patterns:
+    downloadable: "/content-files-downloadable/ncert-solutions/"
+    revision_notes: "/revision-notes/"
+  
+  rate_limit:
+    min_interval_seconds: 3.0
+    max_requests_per_minute: 15
+    burst_allowed: 1
+  
+  retry:
+    max_retries: 3
+    backoff_base: 2.5
+    backoff_max_seconds: 20.0
+  
+  browser:
+    requires_js_rendering: true
+    wait_for_mathjax: true
+    cloudflare_protected: true
+    stealth_mode: true
+  
+  content_types:
+    - articles
+    - ncert_solutions
+    - pdfs
+    - faqs
+  
+  quality_signals:
+    min_content_length: 250
+    ncert_aligned: true
+    prefer_pdfs: true
+  
+  special_handling:
+    extract_pdfs: true
+    parse_faqs: true
+
+# =============================================================================
+# YOUTUBE TRANSCRIPTS
+# =============================================================================
+youtube:
+  enabled: true
+  priority: 4
+  
+  domain: "youtube.com"
+  
+  base_urls:
+    watch: "https://www.youtube.com/watch"
+    short: "https://youtu.be/"
+    embed: "https://www.youtube.com/embed/"
+  
+  # Preferred educational channels for fallback search
+  trusted_channels:
+    physics:
+      - "Khan Academy"
+      - "Physics Wallah"
+      - "Vedantu"
+      - "The Organic Chemistry Tutor"
+    chemistry:
+      - "Khan Academy"
+      - "Professor Dave Explains"
+      - "Tyler DeWitt"
+    mathematics:
+      - "Khan Academy"
+      - "3Blue1Brown"
+      - "Professor Leonard"
+    biology:
+      - "Khan Academy"
+      - "Amoeba Sisters"
+      - "Crash Course"
+  
+  transcript_api:
+    library: "youtube-transcript-api"
+    version: ">=0.6.0"
+    prefer_manual_captions: true
+    fallback_to_auto: true
+    languages: ["en", "en-US", "en-GB"]
+  
+  rate_limit:
+    min_interval_seconds: 1.0  # API is more permissive
+    max_requests_per_minute: 30
+    burst_allowed: 5
+  
+  retry:
+    max_retries: 2
+    backoff_base: 2.0
+    backoff_max_seconds: 8.0
+  
+  proxy:
+    enabled: true
+    type: "residential"  # Cloud IPs often blocked
+    rotation: true
+    countries: ["US", "IN"]
+  
+  quality_signals:
+    min_transcript_length: 500
+    prefer_manual_captions: true
+    min_caption_confidence: 0.8
+
+# =============================================================================
+# GOOGLE SEARCH (FALLBACK)
+# =============================================================================
+google_search:
+  enabled: true
+  priority: 5  # Lowest priority - fallback only
+  
+  domain: "google.com"
+  
+  base_url: "https://www.google.com/search"
+  
+  search_params:
+    num_results: 10
+    safe_search: "active"
+    language: "en"
+  
+  query_templates:
+    conceptual: "grade {grade} {subject} {topic} explanation site:edu OR site:org"
+    problem: "grade {grade} {subject} {topic} solved examples"
+    definition: "{topic} definition {subject} NCERT"
+  
+  rate_limit:
+    min_interval_seconds: 5.0  # Very conservative for Google
+    max_requests_per_minute: 10
+    burst_allowed: 1
+  
+  retry:
+    max_retries: 2
+    backoff_base: 5.0
+    backoff_max_seconds: 60.0
+  
+  browser:
+    requires_js_rendering: true
+    stealth_mode: true
+  
+  # Domains to prefer in results
+  preferred_domains:
+    - khanacademy.org
+    - byjus.com
+    - vedantu.com
+    - britannica.com
+    - sciencedirect.com
+  
+  # Domains to skip
+  blocked_domains:
+    - pinterest.com
+    - facebook.com
+    - twitter.com
+    - quora.com
+
+# =============================================================================
+# NOTEBOOKLM INTEGRATION
+# =============================================================================
+notebooklm:
+  enabled: true
+  
+  base_url: "https://notebooklm.google.com"
+  
+  auth:
+    state_file: "notebooklm_auth.json"
+    session_duration_hours: 24
+    refresh_before_expiry_minutes: 30
+  
+  limits:
+    max_sources_per_notebook: 50
+    max_text_source_chars: 500000
+    max_url_sources: 30
+    max_youtube_sources: 20
+  
+  timeouts:
+    page_load_seconds: 30
+    element_wait_seconds: 10
+    compilation_seconds: 60
+    generation_seconds: 120
+  
+  browser:
+    headless: false  # Required for authentication
+    viewport_width: 1280
+    viewport_height: 800
+    slow_mo_ms: 100
+  
+  delays:
+    action_delay_seconds: 1.0
+    source_processing_seconds: 3.0
+    between_sources_seconds: 2.0
+  
+  output_types:
+    - study_guide
+    - briefing_doc
+    - faq
+    - timeline
+    - table_of_contents
+
+# =============================================================================
+# QUALITY THRESHOLDS
+# =============================================================================
+quality:
+  content:
+    min_quality_score: 0.6
+    min_content_items: 2
+    min_concept_count: 1
+  
+  deduplication:
+    similarity_threshold: 0.85
+    minhash_num_perm: 128
+  
+  coverage:
+    min_subtopic_coverage: 0.8
+    min_formula_coverage: 0.7
+  
+  output:
+    study_material:
+      min_pages: 4
+      max_pages: 7
+      min_concept_boxes_per_page: 3
+    questionnaire:
+      total_questions: 50
+      tier_1_count: 20
+      tier_2_count: 20
+      tier_3_count: 10
+      min_assertion_reasoning: 6
+    handout:
+      min_formulas: 3
+      min_pro_tips: 6
+      max_colors: 5
