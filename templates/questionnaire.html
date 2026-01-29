@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<!--
+EduCrawler Questionnaire Template
+=================================
+A4 Portrait format, 50-question tiered assessment
+Tier 1: 20 questions (MCQ, Fill-blank, True/False)
+Tier 2: 20 questions (Application, Case Study, Calculation)
+Tier 3: 10 questions (Assertion-Reasoning, Error Analysis, Synthesis)
+
+Variables:
+- title: Document title
+- subject: Subject name
+- grade: Grade level
+- topic: Main topic
+- tier_1: Tier 1 section with questions
+- tier_2: Tier 2 section with questions
+- tier_3: Tier 3 section with questions
+- include_answer_key: Boolean to include answers
+- generated_at: Generation timestamp
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Questionnaire</title>
+    <style>
+        /* Page Setup - A4 Portrait */
+        @page {
+            size: A4 portrait;
+            margin: 2cm;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        /* Header */
+        .document-header {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #1e40af;
+            margin-bottom: 20px;
+        }
+        
+        .document-header h1 {
+            font-size: 18pt;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+        
+        .document-header .subtitle {
+            font-size: 12pt;
+            color: #4b5563;
+        }
+        
+        .document-header .meta {
+            font-size: 10pt;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        /* Student Info Box */
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            border: 1px solid #d1d5db;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            background: #f9fafb;
+        }
+        
+        .student-info label {
+            font-size: 10pt;
+            color: #4b5563;
+        }
+        
+        .student-info .field {
+            border-bottom: 1px solid #9ca3af;
+            min-width: 150px;
+            display: inline-block;
+        }
+        
+        /* Instructions */
+        .instructions {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 10pt;
+        }
+        
+        .instructions h3 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+        }
+        
+        /* Tier Sections */
+        .tier-section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        
+        .tier-header {
+            background: #1e40af;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tier-header h2 {
+            font-size: 13pt;
+            margin: 0;
+        }
+        
+        .tier-header .marks {
+            font-size: 10pt;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 10px;
+            border-radius: 10px;
+        }
+        
+        /* Tier Colors */
+        .tier-1 .tier-header { background: #059669; }
+        .tier-2 .tier-header { background: #d97706; }
+        .tier-3 .tier-header { background: #dc2626; }
+        
+        .tier-content {
+            border: 1px solid #d1d5db;
+            border-top: none;
+            padding: 15px;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        /* Question Styles */
+        .question {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        
+        .question:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #1e40af;
+            margin-right: 5px;
+        }
+        
+        .question-text {
+            margin-bottom: 10px;
+        }
+        
+        .question-marks {
+            float: right;
+            font-size: 9pt;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        /* MCQ Options */
+        .mcq-options {
+            margin-left: 25px;
+            margin-top: 8px;
+        }
+        
+        .mcq-option {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+        
+        .option-label {
+            font-weight: bold;
+            margin-right: 8px;
+            min-width: 20px;
+        }
+        
+        .option-checkbox {
+            width: 14px;
+            height: 14px;
+            border: 1px solid #9ca3af;
+            border-radius: 3px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        
+        /* Fill in the Blank */
+        .blank {
+            display: inline-block;
+            min-width: 100px;
+            border-bottom: 1px solid #333;
+            margin: 0 5px;
+        }
+        
+        /* True/False */
+        .tf-options {
+            margin-left: 25px;
+            margin-top: 8px;
+        }
+        
+        .tf-option {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+        
+        /* Assertion-Reasoning */
+        .ar-question {
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        
+        .ar-assertion, .ar-reason {
+            margin-bottom: 10px;
+        }
+        
+        .ar-label {
+            font-weight: bold;
+            color: #dc2626;
+        }
+        
+        .ar-options {
+            margin-top: 10px;
+            font-size: 10pt;
+        }
+        
+        /* Case Study */
+        .case-study {
+            background: #f0f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #0ea5e9;
+        }
+        
+        .case-study-title {
+            font-weight: bold;
+            color: #0369a1;
+            margin-bottom: 8px;
+        }
+        
+        .sub-questions {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        
+        .sub-question {
+            margin-bottom: 8px;
+        }
+        
+        /* Calculation */
+        .calculation-space {
+            border: 1px dashed #d1d5db;
+            min-height: 80px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fafafa;
+        }
+        
+        .given-data {
+            background: #fefce8;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 8px 0;
+            font-size: 10pt;
+        }
+        
+        /* Answer Key Section */
+        .answer-key {
+            page-break-before: always;
+            margin-top: 30px;
+        }
+        
+        .answer-key-header {
+            background: #1e40af;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        
+        .answer-key-content {
+            border: 1px solid #d1d5db;
+            border-top: none;
+            padding: 15px;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .answer-item {
+            display: flex;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dotted #e5e7eb;
+        }
+        
+        .answer-number {
+            font-weight: bold;
+            min-width: 40px;
+            color: #1e40af;
+        }
+        
+        .answer-value {
+            font-weight: bold;
+            color: #059669;
+            min-width: 50px;
+        }
+        
+        .answer-explanation {
+            font-size: 10pt;
+            color: #4b5563;
+            font-style: italic;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 9pt;
+            color: #9ca3af;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .tier-section {
+                page-break-inside: avoid;
+            }
+            
+            .question {
+                page-break-inside: avoid;
+            }
+            
+            .answer-key {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Document Header -->
+    <div class="document-header">
+        <h1>{{ title }}</h1>
+        <div class="subtitle">Grade {{ grade }} {{ subject | title }} - Assessment</div>
+        <div class="meta">Total Questions: 50 | Total Marks: {{ total_marks | default(70) }} | Time: {{ time_limit | default('60 minutes') }}</div>
+    </div>
+    
+    <!-- Student Info -->
+    <div class="student-info">
+        <div>
+            <label>Name:</label>
+            <span class="field"></span>
+        </div>
+        <div>
+            <label>Roll No:</label>
+            <span class="field"></span>
+        </div>
+        <div>
+            <label>Date:</label>
+            <span class="field"></span>
+        </div>
+    </div>
+    
+    <!-- Instructions -->
+    <div class="instructions">
+        <h3>📋 Instructions</h3>
+        <ul>
+            <li>This question paper contains <strong>50 questions</strong> divided into three tiers.</li>
+            <li><strong>Tier 1 (Q.1-20):</strong> Foundational Knowledge - 1 mark each</li>
+            <li><strong>Tier 2 (Q.21-40):</strong> Application & Conceptual Understanding - 2 marks each</li>
+            <li><strong>Tier 3 (Q.41-50):</strong> Analytical & Evaluative - 3 marks each</li>
+            <li>Read each question carefully before answering.</li>
+            <li>Show all working for calculation questions.</li>
+        </ul>
+    </div>
+    
+    <!-- TIER 1: Foundational Knowledge -->
+    <div class="tier-section tier-1">
+        <div class="tier-header">
+            <h2>TIER 1: Foundational Knowledge</h2>
+            <span class="marks">Questions 1-20 | 1 mark each | Total: 20 marks</span>
+        </div>
+        <div class="tier-content">
+            {% for question in tier_1.questions %}
+            <div class="question">
+                <span class="question-marks">[{{ question.marks }} mark{% if question.marks > 1 %}s{% endif %}]</span>
+                <span class="question-number">Q.{{ question.question_number }}.</span>
+                
+                {% if question.question_type == 'mcq' %}
+                <!-- Multiple Choice Question -->
+                <span class="question-text">{{ question.question_text }}</span>
+                <div class="mcq-options">
+                    {% for option in question.options %}
+                    <div class="mcq-option">
+                        <span class="option-checkbox"></span>
+                        <span class="option-label">({{ option.label }})</span>
+                        <span>{{ option.text }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% elif question.question_type == 'fill_blank' %}
+                <!-- Fill in the Blank -->
+                <span class="question-text">{{ question.question_text | replace('________', '<span class="blank"></span>') | safe }}</span>
+                
+                {% elif question.question_type == 'true_false' %}
+                <!-- True/False -->
+                <span class="question-text">{{ question.question_text }}</span>
+                <div class="tf-options">
+                    <span class="tf-option">
+                        <span class="option-checkbox"></span>
+                        <span>True</span>
+                    </span>
+                    <span class="tf-option">
+                        <span class="option-checkbox"></span>
+                        <span>False</span>
+                    </span>
+                </div>
+                
+                {% else %}
+                <!-- Short Answer -->
+                <span class="question-text">{{ question.question_text }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- TIER 2: Application & Conceptual -->
+    <div class="tier-section tier-2">
+        <div class="tier-header">
+            <h2>TIER 2: Application & Conceptual Understanding</h2>
+            <span class="marks">Questions 21-40 | 2 marks each | Total: 40 marks</span>
+        </div>
+        <div class="tier-content">
+            {% for question in tier_2.questions %}
+            <div class="question">
+                <span class="question-marks">[{{ question.marks }} marks]</span>
+                <span class="question-number">Q.{{ question.question_number }}.</span>
+                
+                {% if question.question_type == 'calculation' %}
+                <!-- Calculation Question -->
+                <span class="question-text">{{ question.question_text }}</span>
+                {% if question.given_data %}
+                <div class="given-data">
+                    <strong>Given:</strong>
+                    {% for key, value in question.given_data.items() %}
+                    {{ key }} = {{ value }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="calculation-space">
+                    <em>Show your working here:</em>
+                </div>
+                
+                {% elif question.question_type == 'case_study' %}
+                <!-- Case Study Question -->
+                <span class="question-text">Read the case study and answer:</span>
+                <div class="case-study">
+                    <div class="case-study-title">📖 Case Study</div>
+                    {{ question.case_description }}
+                </div>
+                <div class="sub-questions">
+                    {% for sub_q in question.sub_questions %}
+                    <div class="sub-question">
+                        <strong>({{ loop.index | string | replace('1','a') | replace('2','b') | replace('3','c') | replace('4','d') | replace('5','e') }})</strong> {{ sub_q }}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% elif question.question_type == 'mcq' %}
+                <!-- MCQ (Conceptual) -->
+                <span class="question-text">{{ question.question_text }}</span>
+                <div class="mcq-options">
+                    {% for option in question.options %}
+                    <div class="mcq-option">
+                        <span class="option-checkbox"></span>
+                        <span class="option-label">({{ option.label }})</span>
+                        <span>{{ option.text }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% else %}
+                <!-- Detailed Answer -->
+                <span class="question-text">{{ question.question_text }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- TIER 3: Analytical & Evaluative -->
+    <div class="tier-section tier-3">
+        <div class="tier-header">
+            <h2>TIER 3: Analytical & Evaluative</h2>
+            <span class="marks">Questions 41-50 | 3 marks each | Total: 30 marks</span>
+        </div>
+        <div class="tier-content">
+            {% for question in tier_3.questions %}
+            <div class="question">
+                <span class="question-marks">[{{ question.marks }} marks]</span>
+                <span class="question-number">Q.{{ question.question_number }}.</span>
+                
+                {% if question.question_type == 'assertion_reasoning' %}
+                <!-- Assertion-Reasoning Question -->
+                <span class="question-text">Read the Assertion (A) and Reason (R) below:</span>
+                <div class="ar-question">
+                    <div class="ar-assertion">
+                        <span class="ar-label">Assertion (A):</span> {{ question.assertion }}
+                    </div>
+                    <div class="ar-reason">
+                        <span class="ar-label">Reason (R):</span> {{ question.reason }}
+                    </div>
+                    <div class="ar-options">
+                        <div class="mcq-option">
+                            <span class="option-checkbox"></span>
+                            <span class="option-label">(a)</span>
+                            <span>Both A and R are true, and R is the correct explanation of A.</span>
+                        </div>
+                        <div class="mcq-option">
+                            <span class="option-checkbox"></span>
+                            <span class="option-label">(b)</span>
+                            <span>Both A and R are true, but R is not the correct explanation of A.</span>
+                        </div>
+                        <div class="mcq-option">
+                            <span class="option-checkbox"></span>
+                            <span class="option-label">(c)</span>
+                            <span>A is true, but R is false.</span>
+                        </div>
+                        <div class="mcq-option">
+                            <span class="option-checkbox"></span>
+                            <span class="option-label">(d)</span>
+                            <span>A is false, but R is true.</span>
+                        </div>
+                        {% if question.options | length > 4 %}
+                        <div class="mcq-option">
+                            <span class="option-checkbox"></span>
+                            <span class="option-label">(e)</span>
+                            <span>Both A and R are false.</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if question.hint %}
+                    <div style="margin-top: 8px; font-size: 10pt; color: #6b7280;">
+                        <em>💡 Hint: {{ question.hint }}</em>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% else %}
+                <!-- Detailed/Synthesis Question -->
+                <span class="question-text">{{ question.question_text }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    {% if include_answer_key %}
+    <!-- ANSWER KEY -->
+    <div class="answer-key">
+        <div class="answer-key-header">
+            <h2>📝 ANSWER KEY</h2>
+        </div>
+        <div class="answer-key-content">
+            <h3>Tier 1 Answers (Q.1-20)</h3>
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 20px;">
+                {% for question in tier_1.questions %}
+                <div class="answer-item">
+                    <span class="answer-number">{{ question.question_number }}.</span>
+                    <span class="answer-value">{{ question.correct_answer }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <h3>Tier 2 Answers (Q.21-40)</h3>
+            {% for question in tier_2.questions %}
+            <div class="answer-item" style="flex-direction: column;">
+                <div>
+                    <span class="answer-number">{{ question.question_number }}.</span>
+                    <span class="answer-value">{{ question.correct_answer }}</span>
+                </div>
+                {% if question.answer_explanation %}
+                <div class="answer-explanation" style="margin-left: 40px;">
+                    {{ question.answer_explanation }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <h3>Tier 3 Answers (Q.41-50)</h3>
+            {% for question in tier_3.questions %}
+            <div class="answer-item" style="flex-direction: column;">
+                <div>
+                    <span class="answer-number">{{ question.question_number }}.</span>
+                    <span class="answer-value">{{ question.correct_answer }}</span>
+                </div>
+                {% if question.answer_explanation %}
+                <div class="answer-explanation" style="margin-left: 40px;">
+                    {{ question.answer_explanation }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Footer -->
+    <div class="footer">
+        Generated by EduCrawler | {{ generated_at | default('January 2026') }}
+    </div>
+</body>
+</html>
