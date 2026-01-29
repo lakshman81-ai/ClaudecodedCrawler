@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<!--
+EduCrawler Study Material Template
+==================================
+A4 Landscape format, 5E/LES pedagogical framework
+Supports: Physics (5E), Chemistry (5E), Math (LES), History (Narrative)
+
+Variables:
+- title: Document title
+- subject: Subject name
+- grade: Grade level
+- topic: Main topic
+- subtopics: List of subtopics
+- pedagogical_model: "5e" | "les" | "narrative"
+- pages: List of page objects
+- sources: List of source URLs
+- generated_at: Generation timestamp
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Grade {{ grade }} {{ subject }}</title>
+    <style>
+        /* Page Setup - A4 Landscape */
+        @page {
+            size: A4 landscape;
+            margin: 1.5cm;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            background: #fff;
+        }
+        
+        /* Header & Footer */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2563eb;
+            margin-bottom: 15px;
+        }
+        
+        .header-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #1e40af;
+        }
+        
+        .header-meta {
+            font-size: 9pt;
+            color: #666;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .page-number::after {
+            content: counter(page);
+        }
+        
+        /* Page Container */
+        .page {
+            page-break-after: always;
+            min-height: calc(100vh - 4cm);
+            padding: 15px;
+        }
+        
+        .page:last-child {
+            page-break-after: auto;
+        }
+        
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 70% 30%;
+            gap: 20px;
+        }
+        
+        .main-content {
+            padding-right: 15px;
+        }
+        
+        .sidebar {
+            border-left: 2px solid #e5e7eb;
+            padding-left: 15px;
+        }
+        
+        /* Section Headers */
+        h1 {
+            font-size: 16pt;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2563eb;
+        }
+        
+        h2 {
+            font-size: 13pt;
+            color: #1e3a8a;
+            margin: 15px 0 10px 0;
+        }
+        
+        h3 {
+            font-size: 11pt;
+            color: #1e40af;
+            margin: 10px 0 8px 0;
+        }
+        
+        /* Pedagogical Phase Badges */
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 10pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        /* 5E Model Colors */
+        .phase-engage { background: #fef3c7; color: #92400e; }
+        .phase-explore { background: #d1fae5; color: #065f46; }
+        .phase-explain { background: #dbeafe; color: #1e40af; }
+        .phase-elaborate { background: #ede9fe; color: #5b21b6; }
+        .phase-evaluate { background: #fce7f3; color: #9d174d; }
+        
+        /* LES Model Colors */
+        .phase-launch { background: #ffedd5; color: #9a3412; }
+        .phase-explore-les { background: #d1fae5; color: #065f46; }
+        .phase-summarize { background: #e0e7ff; color: #3730a3; }
+        
+        /* Concept Boxes */
+        .concept-box {
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 4px solid;
+        }
+        
+        .concept-helper {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+        
+        .concept-helper::before {
+            content: "💡 Concept Helper";
+            display: block;
+            font-weight: bold;
+            color: #1d4ed8;
+            margin-bottom: 5px;
+        }
+        
+        .misunderstanding {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+        
+        .misunderstanding::before {
+            content: "⚠️ Common Misunderstanding";
+            display: block;
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 5px;
+        }
+        
+        .real-world {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+        
+        .real-world::before {
+            content: "🌍 Real-World Application";
+            display: block;
+            font-weight: bold;
+            color: #16a34a;
+            margin-bottom: 5px;
+        }
+        
+        .did-you-know {
+            background: #faf5ff;
+            border-color: #a855f7;
+        }
+        
+        .did-you-know::before {
+            content: "🔍 Did You Know?";
+            display: block;
+            font-weight: bold;
+            color: #9333ea;
+            margin-bottom: 5px;
+        }
+        
+        /* Cornell Notes */
+        .cornell-notes {
+            display: grid;
+            grid-template-columns: 30% 70%;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .cornell-cue {
+            background: #f9fafb;
+            padding: 10px;
+            border-right: 1px solid #d1d5db;
+        }
+        
+        .cornell-cue h4 {
+            font-size: 10pt;
+            color: #4b5563;
+            margin-bottom: 5px;
+        }
+        
+        .cornell-notes-content {
+            padding: 10px;
+        }
+        
+        .cornell-summary {
+            grid-column: 1 / -1;
+            background: #f3f4f6;
+            padding: 10px;
+            border-top: 1px solid #d1d5db;
+            font-style: italic;
+        }
+        
+        /* Formulas */
+        .formula {
+            background: #fefce8;
+            border: 1px solid #facc15;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .formula-name {
+            font-weight: bold;
+            color: #854d0e;
+            margin-bottom: 5px;
+        }
+        
+        .formula-equation {
+            font-size: 14pt;
+            font-family: 'Times New Roman', serif;
+            color: #1e40af;
+            margin: 8px 0;
+        }
+        
+        .formula-variables {
+            font-size: 9pt;
+            color: #666;
+            text-align: left;
+            margin-top: 8px;
+        }
+        
+        /* Examples */
+        .example {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        
+        .example-title {
+            font-weight: bold;
+            color: #0369a1;
+            margin-bottom: 8px;
+        }
+        
+        .example-problem {
+            margin-bottom: 10px;
+        }
+        
+        .example-solution {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .example-solution ol {
+            margin-left: 20px;
+        }
+        
+        .example-answer {
+            font-weight: bold;
+            color: #059669;
+            margin-top: 8px;
+            padding: 8px;
+            background: #ecfdf5;
+            border-radius: 4px;
+        }
+        
+        /* Images */
+        .figure {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .figure-caption {
+            font-size: 9pt;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+        
+        /* Key Points */
+        .key-points {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 10px 15px;
+            margin: 10px 0;
+        }
+        
+        .key-points h4 {
+            color: #c2410c;
+            margin-bottom: 5px;
+        }
+        
+        .key-points ul {
+            margin-left: 20px;
+        }
+        
+        /* Activities */
+        .activity {
+            background: #ecfdf5;
+            border: 1px dashed #10b981;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        
+        .activity-title {
+            font-weight: bold;
+            color: #047857;
+            margin-bottom: 8px;
+        }
+        
+        /* Sources */
+        .sources {
+            font-size: 8pt;
+            color: #9ca3af;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .page {
+                page-break-after: always;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% for page in pages %}
+    <div class="page" id="page-{{ page.page_number }}">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">{{ title }} - {{ subject | title }}</div>
+            <div class="header-meta">Grade {{ grade }} | {{ generated_at | default('January 2026') }}</div>
+        </div>
+        
+        <!-- Phase Badge -->
+        {% if page.phase %}
+        <span class="phase-badge phase-{{ page.phase | lower | replace(' ', '-') }}">
+            {{ page.phase }}
+        </span>
+        {% endif %}
+        
+        <h1>{{ page.title }}</h1>
+        
+        <div class="two-column">
+            <!-- Main Content -->
+            <div class="main-content">
+                {% for section in page.sections %}
+                <h2>{{ section.heading }}</h2>
+                <div class="section-content">
+                    {{ section.content | safe }}
+                </div>
+                {% endfor %}
+                
+                <!-- Cornell Notes (if present) -->
+                {% if page.cornell_notes %}
+                <div class="cornell-notes">
+                    {% for note in page.cornell_notes %}
+                    <div class="cornell-cue">
+                        <h4>{{ note.cue }}</h4>
+                    </div>
+                    <div class="cornell-notes-content">
+                        {{ note.notes | safe }}
+                    </div>
+                    {% endfor %}
+                    {% if page.summary %}
+                    <div class="cornell-summary">
+                        <strong>Summary:</strong> {{ page.summary }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Examples -->
+                {% for example in page.examples | default([]) %}
+                <div class="example">
+                    <div class="example-title">📝 Example {{ loop.index }}: {{ example.title }}</div>
+                    <div class="example-problem">
+                        <strong>Problem:</strong> {{ example.problem }}
+                    </div>
+                    <div class="example-solution">
+                        <strong>Solution:</strong>
+                        <ol>
+                            {% for step in example.steps %}
+                            <li>{{ step }}</li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                    <div class="example-answer">
+                        ✓ Answer: {{ example.answer }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Sidebar with Concept Boxes -->
+            <div class="sidebar">
+                {% for box in page.concept_boxes %}
+                <div class="concept-box {{ box.box_type | replace('_', '-') }}">
+                    {{ box.content }}
+                </div>
+                {% endfor %}
+                
+                <!-- Formulas -->
+                {% for formula in page.formulas | default([]) %}
+                <div class="formula">
+                    <div class="formula-name">{{ formula.name }}</div>
+                    <div class="formula-equation">{{ formula.unicode }}</div>
+                    {% if formula.variables %}
+                    <div class="formula-variables">
+                        <strong>Where:</strong><br>
+                        {% for var, desc in formula.variables.items() %}
+                        {{ var }} = {{ desc }}<br>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                <!-- Key Points -->
+                {% if page.key_points %}
+                <div class="key-points">
+                    <h4>🔑 Key Points</h4>
+                    <ul>
+                        {% for point in page.key_points %}
+                        <li>{{ point }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Images/Diagrams -->
+        {% for image in page.images | default([]) %}
+        <div class="figure">
+            <img src="{{ image.url }}" alt="{{ image.alt_text }}">
+            <div class="figure-caption">{{ image.caption }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    
+    <!-- Sources Attribution -->
+    <div class="sources">
+        <strong>Sources:</strong>
+        {% for source in sources %}
+        {{ source }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <span>{{ title }} | Grade {{ grade }} {{ subject }}</span>
+        <span> | Page <span class="page-number"></span></span>
+    </div>
+</body>
+</html>

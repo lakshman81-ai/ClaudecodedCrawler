@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<!--
+EduCrawler Handout Template
+===========================
+A4 Landscape format, single-page quick reference
+Zone 1 (Top): Formula Reference Table
+Zone 2 (Middle): Visual Map (Timeline/Mind Map/Flowchart)
+Zone 3 (Bottom): Pro Tips
+
+Variables:
+- title: Document title
+- subject: Subject name
+- grade: Grade level
+- topic: Main topic
+- formula_table: List of formula entries
+- visual_map_type: "timeline" | "mind_map" | "flowchart"
+- visual_map_nodes: List of nodes for visual
+- memory_tricks: List of memory tricks
+- pro_formulas: List of advanced formulas
+- dont_confuse: List of common errors
+- problem_solving_tips: List of tips
+- color_palette: List of 5 colors
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Quick Reference</title>
+    <style>
+        /* Page Setup - A4 Landscape, Single Page */
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #333;
+            background: #fff;
+            height: 100vh;
+            max-height: 210mm; /* A4 height in landscape = width in portrait */
+            overflow: hidden;
+        }
+        
+        /* Main Container */
+        .handout-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 8px;
+        }
+        
+        /* Header */
+        .handout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, {{ color_palette[0] | default('#1e40af') }} 0%, {{ color_palette[1] | default('#3b82f6') }} 100%);
+            color: #fff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .handout-header h1 {
+            font-size: 14pt;
+            font-weight: bold;
+        }
+        
+        .handout-header .meta {
+            font-size: 9pt;
+            opacity: 0.9;
+        }
+        
+        /* Zone Container */
+        .zones-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 10px;
+        }
+        
+        /* Zone 1: Formula Table (Top Third) */
+        .zone-1 {
+            flex: 0 0 30%;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .zone-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: {{ color_palette[0] | default('#1e40af') }};
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* Formula Table */
+        .formula-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+        }
+        
+        .formula-table th {
+            background: {{ color_palette[0] | default('#1e40af') }};
+            color: #fff;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .formula-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .formula-table tr:nth-child(even) {
+            background: #f1f5f9;
+        }
+        
+        .formula-cell {
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+            color: {{ color_palette[1] | default('#3b82f6') }};
+            font-weight: bold;
+        }
+        
+        .unit-cell {
+            font-size: 8pt;
+            color: #64748b;
+        }
+        
+        /* Zone 2: Visual Map (Middle Third) */
+        .zone-2 {
+            flex: 0 0 35%;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .visual-map-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        /* Mind Map Styles */
+        .mind-map {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .central-node {
+            background: {{ color_palette[0] | default('#1e40af') }};
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 11pt;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .branch-node {
+            background: {{ color_palette[2] | default('#10b981') }};
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 9pt;
+            margin: 3px;
+        }
+        
+        .leaf-node {
+            background: {{ color_palette[3] | default('#f59e0b') }};
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 8pt;
+            margin: 2px;
+        }
+        
+        /* Timeline Styles */
+        .timeline {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 20px 0;
+            position: relative;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 3px;
+            background: {{ color_palette[0] | default('#1e40af') }};
+            transform: translateY(-50%);
+        }
+        
+        .timeline-items {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 5%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 100px;
+        }
+        
+        .timeline-marker {
+            width: 16px;
+            height: 16px;
+            background: {{ color_palette[1] | default('#3b82f6') }};
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .timeline-label {
+            font-size: 8pt;
+            text-align: center;
+            margin-top: 5px;
+            font-weight: bold;
+            color: {{ color_palette[0] | default('#1e40af') }};
+        }
+        
+        .timeline-desc {
+            font-size: 7pt;
+            text-align: center;
+            color: #64748b;
+            max-width: 80px;
+        }
+        
+        /* Flowchart Styles */
+        .flowchart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .flow-step {
+            background: {{ color_palette[2] | default('#10b981') }};
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 9pt;
+            text-align: center;
+        }
+        
+        .flow-arrow {
+            color: {{ color_palette[0] | default('#1e40af') }};
+            font-size: 14pt;
+            font-weight: bold;
+        }
+        
+        /* Zone 3: Pro Tips (Bottom Third) */
+        .zone-3 {
+            flex: 0 0 30%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        .tip-box {
+            background: #fff;
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .tip-title {
+            font-size: 9pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .memory-tricks .tip-title {
+            color: #7c3aed;
+        }
+        
+        .memory-tricks {
+            border-left: 3px solid #7c3aed;
+        }
+        
+        .pro-formulas .tip-title {
+            color: #0891b2;
+        }
+        
+        .pro-formulas {
+            border-left: 3px solid #0891b2;
+        }
+        
+        .dont-confuse .tip-title {
+            color: #dc2626;
+        }
+        
+        .dont-confuse {
+            border-left: 3px solid #dc2626;
+        }
+        
+        .problem-solving .tip-title {
+            color: #059669;
+        }
+        
+        .problem-solving {
+            border-left: 3px solid #059669;
+        }
+        
+        .tip-content {
+            font-size: 8pt;
+            color: #475569;
+        }
+        
+        .tip-item {
+            margin-bottom: 4px;
+            padding-left: 10px;
+            position: relative;
+        }
+        
+        .tip-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: inherit;
+        }
+        
+        .error-example {
+            background: #fef2f2;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 8pt;
+            margin: 3px 0;
+        }
+        
+        .error-wrong {
+            color: #dc2626;
+            text-decoration: line-through;
+        }
+        
+        .error-correct {
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .handout-footer {
+            text-align: center;
+            font-size: 7pt;
+            color: #94a3b8;
+            padding-top: 5px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 5px;
+        }
+        
+        /* Print Optimization */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .handout-container {
+                height: 100vh;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="handout-container">
+        <!-- Header -->
+        <div class="handout-header">
+            <h1>📚 {{ title }}</h1>
+            <div class="meta">Grade {{ grade }} {{ subject | title }} | Quick Reference</div>
+        </div>
+        
+        <div class="zones-container">
+            <!-- ZONE 1: Formula Reference Table -->
+            <div class="zone-1">
+                <div class="zone-title">📐 Formula Quick Reference</div>
+                <table class="formula-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Concept</th>
+                            <th style="width: 30%">Formula</th>
+                            <th style="width: 15%">Units</th>
+                            <th style="width: 35%">When to Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for formula in formula_table %}
+                        <tr>
+                            <td><strong>{{ formula.concept }}</strong></td>
+                            <td class="formula-cell">{{ formula.formula_unicode }}</td>
+                            <td class="unit-cell">{{ formula.units }}</td>
+                            <td>{{ formula.when_to_use }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- ZONE 2: Visual Map -->
+            <div class="zone-2">
+                <div class="zone-title">
+                    {% if visual_map_type == 'timeline' %}
+                    ⏱️ Timeline
+                    {% elif visual_map_type == 'flowchart' %}
+                    🔄 Process Flow
+                    {% else %}
+                    🧠 Concept Map
+                    {% endif %}
+                    : {{ visual_map_title | default(topic) }}
+                </div>
+                
+                <div class="visual-map-container">
+                    {% if visual_map_type == 'timeline' %}
+                    <!-- Timeline View -->
+                    <div class="timeline">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-items">
+                            {% for node in visual_map_nodes %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-label">{{ node.label }}</div>
+                                {% if node.description %}
+                                <div class="timeline-desc">{{ node.description }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    {% elif visual_map_type == 'flowchart' %}
+                    <!-- Flowchart View -->
+                    <div class="flowchart">
+                        {% for node in visual_map_nodes %}
+                        <div class="flow-step">{{ node.label }}</div>
+                        {% if not loop.last %}
+                        <span class="flow-arrow">→</span>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                    {% else %}
+                    <!-- Mind Map View (Default) -->
+                    <div class="mind-map">
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <!-- Central Node -->
+                            {% for node in visual_map_nodes if node.node_type == 'central' %}
+                            <div class="central-node">{{ node.label }}</div>
+                            {% endfor %}
+                            
+                            <!-- Branch Nodes -->
+                            <div style="display: flex; gap: 20px; margin-top: 15px;">
+                                {% for node in visual_map_nodes if node.node_type == 'branch' %}
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <div class="branch-node">{{ node.label }}</div>
+                                    <div style="display: flex; flex-wrap: wrap; justify-content: center; max-width: 150px;">
+                                        {% for leaf in visual_map_nodes if leaf.node_type == 'leaf' and leaf.parent_id == node.id %}
+                                        <div class="leaf-node">{{ leaf.label }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- ZONE 3: Pro Tips -->
+            <div class="zone-3">
+                <!-- Memory Tricks -->
+                <div class="tip-box memory-tricks">
+                    <div class="tip-title">🧠 Memory Tricks</div>
+                    <div class="tip-content">
+                        {% for trick in memory_tricks %}
+                        <div class="tip-item">{{ trick.content }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Pro Formulas -->
+                <div class="tip-box pro-formulas">
+                    <div class="tip-title">⚡ Pro Formulas</div>
+                    <div class="tip-content">
+                        {% for formula in pro_formulas %}
+                        <div class="tip-item">
+                            <strong>{{ formula.title }}:</strong><br>
+                            {{ formula.content }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Don't Confuse -->
+                <div class="tip-box dont-confuse">
+                    <div class="tip-title">⚠️ Don't Confuse</div>
+                    <div class="tip-content">
+                        {% for item in dont_confuse %}
+                        <div class="error-example">
+                            <span class="error-wrong">✗ {{ item.wrong_approach }}</span><br>
+                            <span class="error-correct">✓ {{ item.correct_approach }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Problem Solving Tips -->
+                <div class="tip-box problem-solving">
+                    <div class="tip-title">✅ Problem Solving</div>
+                    <div class="tip-content">
+                        {% for tip in problem_solving_tips %}
+                        <div class="tip-item">{{ tip }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="handout-footer">
+            {{ title }} | Grade {{ grade }} {{ subject | title }} | Generated {{ generated_at | default('January 2026') }}
+        </div>
+    </div>
+</body>
+</html>

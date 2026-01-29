@@ -1,0 +1,33 @@
+# EduCrawler Configuration
+
+# Rate limiting
+rate_limit:
+  min_interval_seconds: 2.0
+  max_requests_per_minute: 20
+  burst_allowance: 2
+
+# Retry settings
+retry:
+  max_retries: 3
+  backoff_base: 2.0
+  backoff_max: 32.0
+
+# Source priorities
+sources:
+  khan_academy:
+    priority: 1
+    enabled: true
+  youtube:
+    priority: 2
+    enabled: true
+  byjus:
+    priority: 3
+    enabled: true
+  vedantu:
+    priority: 4
+    enabled: true
+
+# Logging
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
